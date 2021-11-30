@@ -22,14 +22,14 @@ public class SessionFactoryDemo {
 
         System.out.println(people);
 
-        Person tetiana = session.find(Person.class, 2L);
+        Person person2 = session.find(Person.class, 2L);
 
-        System.out.println(tetiana);
+        System.out.println(person2);
         System.out.println(session.find(Person.class, 2L));
         System.out.println(session.find(Person.class, 1L));
         System.out.println(session.find(Person.class, 2L));
 
-        tetiana.setLastName("Changed");
+        person2.setLastName("Changed");
 
         session.close();
     }
