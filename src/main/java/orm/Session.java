@@ -29,7 +29,7 @@ public class Session {
 
     private String getIdField(Class<?> type) {
         return Arrays.stream(type.getDeclaredFields())
-            .filter(field -> Objects.nonNull(field.getAnnotation(Id.class)))
+            .filter(field -> field.getAnnotation(Id.class) != null)
             .findFirst()
             .map(field -> field.getAnnotation(Id.class).name())
             .orElseThrow(() -> new EntityIdentityNotFound(
@@ -40,7 +40,7 @@ public class Session {
     private String getTableName(Class<?> type) {
         Table tableNameAnnotation = type.getAnnotation(Table.class);
 
-        if (Objects.nonNull(tableNameAnnotation) && Objects.nonNull(tableNameAnnotation.name())) {
+        if (tableNameAnnotation != null && tableNameAnnotation.name() != null) {
             return tableNameAnnotation.name();
         }
 
@@ -50,7 +50,7 @@ public class Session {
     private String getColumnName(Field field) {
         Column fieldAnnotation = field.getAnnotation(Column.class);
 
-        if (Objects.nonNull(fieldAnnotation) && Objects.nonNull(fieldAnnotation.name())) {
+        if (fieldAnnotation != null && fieldAnnotation.name() != null) {
             return fieldAnnotation.name();
         }
 
@@ -168,11 +168,8 @@ public class Session {
         var key = new EntityKey(type, id);
         var cachedResult = cache.get(key);
 
-        if (Objects.nonNull(cachedResult)) {
-            return Optional.of(type.cast(cachedResult));
-        }
-
-        return Optional.empty();
+        return Optional.ofNullable(cachedResult)
+            .map(type::cast);
     }
 
     private Object[] getObjectValues(Object value) {
