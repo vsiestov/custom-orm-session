@@ -1,12 +1,20 @@
 package demo;
 
+import lombok.SneakyThrows;
 import org.postgresql.ds.PGSimpleDataSource;
 import orm.Session;
 import orm.SessionFactory;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Random;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SessionFactoryDemo {
+    @SneakyThrows
     public static void main(String[] args) {
         PGSimpleDataSource dataSource = new PGSimpleDataSource();
 
@@ -18,18 +26,22 @@ public class SessionFactoryDemo {
         SessionFactory sessionFactory = new SessionFactory(dataSource);
         Session session = sessionFactory.createSession();
 
-        List<Person> people = session.find(Person.class);
+        Person newPerson = new Person();
 
-        System.out.println(people);
+        newPerson.setFirstName("New Person First Name");
+        newPerson.setLastName("New Person Last Name");
+        newPerson.setEmail("vsi@container-xchange.com");
 
-        Person person2 = session.find(Person.class, 2L);
+        session.persist(newPerson);
 
-        System.out.println(person2);
-        System.out.println(session.find(Person.class, 2L));
-        System.out.println(session.find(Person.class, 1L));
-        System.out.println(session.find(Person.class, 2L));
+        List<Person> list = session.find(Person.class);
 
-        person2.setLastName("Changed 2");
+        session.remove(list.get(list.size() - 1));
+
+        byte[] array = new byte[7];
+        new Random().nextBytes(array);
+        Person secondPerson = session.find(Person.class, 2L);
+        secondPerson.setLastName(new String(array, UTF_8));
 
         session.close();
     }
